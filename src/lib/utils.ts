@@ -1,3 +1,5 @@
+// for showing date and time when post created
+
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
 
