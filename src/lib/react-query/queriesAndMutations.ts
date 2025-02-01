@@ -15,7 +15,7 @@ import {
   useQueryClient,
   useInfiniteQuery,
 } from "@tanstack/react-query";
-
+import { updatePost } from "@/lib/appwrite/api"; 
 import { QUERY_KEYS } from "@/lib/react-query/queryKeys";
 import {
   createUserAccount,
@@ -32,7 +32,7 @@ import {
   getUserById,
   updateUser,
   getRecentPosts,
-  // getInfinitePosts,
+  getInfinitePosts,
   searchPosts,
   savePost,
   deleteSavedPost,
@@ -231,6 +231,9 @@ export const useGetPosts = () => {
 
 
 
+
+
+
 export const useGetPostById = (postId?: string) => {
   return useQuery({
     queryKey: [QUERY_KEYS.GET_POST_BY_ID, postId],
@@ -260,3 +263,4 @@ export const useUpdateUser = () => {
     },
   });
 };
+

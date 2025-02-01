@@ -6,8 +6,7 @@ import { checkIsLiked } from "@/lib/utils";
 import { useDeleteSavedPost, useGetCurrentUser, useLikePost, useSavePost } from "@/lib/react-query/queriesAndMutations";
 import { useUserContext } from "@/context/AuthContext";
 import { Loader } from "lucide-react";
-// import { useLikePost, useSavePost, useDeleteSavedPost, useGetCurrentUser,
-// } from "@/lib/react-query/queriesAndMutations";
+
 
 type PostStatsProps = {
   post?: Models.Document;
@@ -27,7 +26,7 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
 
   const { data: currentUser } = useGetCurrentUser();
 
-  const savedpostRecord = currentUser?.save.find((record: Models.Document) => record.post.$id === post.$id);
+  const savedpostRecord = currentUser?.save.find((record: Models.Document) => record.post?.$id === post?.$id);
   useEffect(() => {
 
     // for understanding:
@@ -37,13 +36,13 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
     setIsSaved(!!savedpostRecord)
   }, [currentUser])
 
-  // const savedPostRecord = currentUser?.save.find(
-  //   (record: Models.Document) => record.post.$id === post.$id
-  // );
+  const savedPostRecord = currentUser?.save.find(
+    (record: Models.Document) => record.post.$id === post?.$id
+  );
 
-  // useEffect(() => {
-  //   setIsSaved(!!savedPostRecord);
-  // }, [currentUser]);
+  useEffect(() => {
+    setIsSaved(!!savedPostRecord);
+  }, [currentUser]);
 
   const handleLikePost = (
     e: React.MouseEvent<HTMLImageElement, MouseEvent>

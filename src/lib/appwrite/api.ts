@@ -1,4 +1,5 @@
 import {ID} from 'appwrite';
+import { ImageGravity } from 'appwrite'; 
 import { INewPost, INewUser, IUpdatePost, IUpdateUser } from "@/types";
 import { account, appwriteConfig, avatars, databases, storage } from './config';
 // import { Query } from '@tanstack/react-query';
@@ -159,7 +160,7 @@ export async function uploadFile(file: File){
 export function getFilePreview(fileId: string){
     try {
         const fileUrl = storage.getFilePreview(
-            appwriteConfig.storageId, fileId, 2000, 2000, "top", 100
+            appwriteConfig.storageId, fileId, 2000, 2000, ImageGravity.Top, 100
         )
         return fileUrl;
     } catch (error) {
@@ -454,7 +455,7 @@ export async function getInfinitePosts({ pageParam }: { pageParam: number }) {
   }
 }
 
-async function updatePost(post: IUpdatePost) {
+export async function updatePost(post: IUpdatePost) {
     const hasFileToUpdate = post.file.length > 0;
 
     try {
