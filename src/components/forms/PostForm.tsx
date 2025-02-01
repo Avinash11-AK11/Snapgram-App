@@ -19,8 +19,7 @@ import { PostValidation } from "@/lib/validation";
 import { useToast } from "@/components/ui/use-toast";
 import { useUserContext } from "@/context/AuthContext";
 import { FileUploader, Loader } from "@/components/shared";
-import { useCreatePost } from "@/lib/react-query/queriesAndMutations";
-import { createPost } from "@/lib/appwrite/api";
+import { useCreatePost, useUpdatePost } from "@/lib/react-query/queriesAndMutations";
 
 type PostFormProps = {
   post?: Models.Document;
@@ -44,27 +43,27 @@ const PostForm = ({ post, action }: PostFormProps) => {
   // Query
   const { mutateAsync: createPost, isPending: isLoadingCreate } =
     useCreatePost();
-  // const { mutateAsync: updatePost, isLoading: isLoadingUpdate } =
-  //   useUpdatePost();
+  const { mutateAsync: updatePost, isPending: isLoadingUpdate } =
+    useUpdatePost();
 
- // Handler
+  // Handler
   const handleSubmit = async (value: z.infer<typeof PostValidation>) => {
     // ACTION = UPDATE
-    // if (post && action === "Update") {
-    //   const updatedPost = await updatePost({
-    //     ...value,
-    //     postId: post.$id,
-    //     imageId: post.imageId,
-    //     imageUrl: post.imageUrl,
-    //   });
+    if (post && action === "Update") {
+      const updatedPost = await updatePost({
+        ...value,
+        postId: post.$id,
+        imageId: post.imageId,
+        imageUrl: post.imageUrl,
+      });
 
-    //   if (!updatedPost) {
-    //     toast({
-    //       title: `${action} post failed. Please try again.`,
-    //     });
-    //   }
-    //   return navigate(`/posts/${post.$id}`);
-    // }
+      if (!updatedPost) {
+        toast({
+          title: `${action} post failed. Please try again.`,
+        });
+      }
+      return navigate(`/posts/${post.$id}`);
+    }
 
     // ACTION = CREATE
     const newPost = await createPost({
@@ -139,8 +138,7 @@ const PostForm = ({ post, action }: PostFormProps) => {
           render={({ field }) => (
             <FormItem>
               <FormLabel className="shad-form_label">
-                Add Tags
-                {/* Add Tags (separated by comma " , ") */}
+                Add Tags (separated by comma " , ")
               </FormLabel>
               <FormControl>
                 <Input
@@ -165,8 +163,8 @@ const PostForm = ({ post, action }: PostFormProps) => {
           <Button
             type="submit"
             className="shad-button_primary whitespace-nowrap"
-            disabled={isLoadingCreate}>
-            {(isLoadingCreate) && <Loader />}
+            disabled={isLoadingCreate || isLoadingUpdate}>
+            {(isLoadingCreate || isLoadingUpdate) && <Loader />}
             {action} Post
           </Button>
         </div>

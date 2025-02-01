@@ -3,26 +3,39 @@ import { useState, useEffect } from "react";
 import { useLocation } from "react-router-dom";
 
 import { checkIsLiked } from "@/lib/utils";
+import { useDeleteSavedPost, useGetCurrentUser, useLikePost, useSavePost } from "@/lib/react-query/queriesAndMutations";
+import { useUserContext } from "@/context/AuthContext";
+import { Loader } from "lucide-react";
 // import { useLikePost, useSavePost, useDeleteSavedPost, useGetCurrentUser,
 // } from "@/lib/react-query/queriesAndMutations";
 
 type PostStatsProps = {
-  post: Models.Document;
+  post?: Models.Document;
   userId: string;
 };
 
 const PostStats = ({ post, userId }: PostStatsProps) => {
   const location = useLocation();
-  const likesList = post.likes.map((user: Models.Document) => user.$id);
+  const likesList = post?.likes.map((user: Models.Document) => user.$id);
 
   const [likes, setLikes] = useState<string[]>(likesList);
   const [isSaved, setIsSaved] = useState(false);
 
-  // const { mutate: likePost } = useLikePost();
-  // const { mutate: savePost } = useSavePost();
-  // const { mutate: deleteSavePost } = useDeleteSavedPost();
+  const { mutate: likePost } = useLikePost();
+  const { mutate: savePost, isPending: isSavingPost } = useSavePost();
+  const { mutate: deleteSavePost, isPending: isDeletingSaved } = useDeleteSavedPost();
 
-  // const { data: currentUser } = useGetCurrentUser();
+  const { data: currentUser } = useGetCurrentUser();
+
+  const savedpostRecord = currentUser?.save.find((record: Models.Document) => record.post.$id === post.$id);
+  useEffect(() => {
+
+    // for understanding:
+    // { saved: true} => !savedPostedRecord => !false = true;
+
+    // setIsSaved(savedpostRecord ? true : false)
+    setIsSaved(!!savedpostRecord)
+  }, [currentUser])
 
   // const savedPostRecord = currentUser?.save.find(
   //   (record: Models.Document) => record.post.$id === post.$id
@@ -37,16 +50,17 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
   ) => {
     e.stopPropagation();
 
-    let likesArray = [...likes];
+    let newLikes = [...likes];
 
-    if (likesArray.includes(userId)) {
-      likesArray = likesArray.filter((Id) => Id !== userId);
+    const hasLiked = newLikes.includes(userId);
+    if (hasLiked) {
+      newLikes = newLikes.filter((Id) => Id !== userId);
     } else {
-      likesArray.push(userId);
+      newLikes.push(userId);
     }
 
-    setLikes(likesArray);
-    // likePost({ postId: post.$id, likesArray });
+    setLikes(newLikes);
+    likePost({ postId: post?.$id || '', likesArray: newLikes });
   };
 
   const handleSavePost = (
@@ -54,14 +68,17 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
   ) => {
     e.stopPropagation();
 
-  //   if (savedPostRecord) {
-  //     setIsSaved(false);
-  //     return deleteSavePost(savedPostRecord.$id);
-  //   }
+    
 
-  //   savePost({ userId: userId, postId: post.$id });
-  //   setIsSaved(true);
-  // };
+    if (savedpostRecord) {
+      setIsSaved(false);
+      deleteSavePost(savedpostRecord.$id);
+    } else{
+      savePost({ userId: userId, postId: post?.$id || ''});
+      setIsSaved(true);
+    }
+
+  };
 
   const containerStyles = location.pathname.startsWith("/profile")
     ? "w-full"
@@ -80,25 +97,26 @@ const PostStats = ({ post, userId }: PostStatsProps) => {
           alt="like"
           width={20}
           height={20}
-          onClick={(e) => handleLikePost(e)}
+          onClick={handleLikePost}
           className="cursor-pointer"
         />
         <p className="small-medium lg:base-medium">{likes.length}</p>
       </div>
 
       <div className="flex gap-2">
-        <img
+        {isSavingPost || isDeletingSaved ? <Loader /> : <img
           src={isSaved ? "/assets/icons/saved.svg" : "/assets/icons/save.svg"}
           alt="share"
           width={20}
           height={20}
           className="cursor-pointer"
-          onClick={(e) => handleSavePost(e)}
+          onClick={handleSavePost}
         />
+        }
       </div>
     </div>
   );
 };
-}
+
 
 export default PostStats;
