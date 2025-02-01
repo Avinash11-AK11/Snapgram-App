@@ -154,10 +154,10 @@ export async function uploadFile(file: File){
 }
 
 
-export  function getFilePreview(fileId: string){
+export function getFilePreview(fileId: string){
     try {
         const fileUrl = storage.getFilePreview(
-            appwriteConfig.storageId, fileId, 2000, 2000, "top", 100,
+            appwriteConfig.storageId, fileId, 2000, 2000, "top", 100
         )
         return fileUrl;
     } catch (error) {

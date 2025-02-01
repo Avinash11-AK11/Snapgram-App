@@ -1,7 +1,7 @@
 import { Models } from "appwrite";
 import { Link } from "react-router-dom";
 
-import { PostStats } from "@/components/shared";
+// import { PostStats } from "@/components/shared";
 import { multiFormatDateString } from "@/lib/utils";
 import { useUserContext } from "@/context/AuthContext";
 
@@ -19,6 +19,8 @@ const PostCard = ({ post }: PostCardProps) => {
       <div className="flex-between">
         <div className="flex items-center gap-3">
           <Link to={`/profile/${post.creator.$id}`}>
+
+          {/* link of immage */}
             <img
               src={
                 post.creator?.imageUrl ||
@@ -69,6 +71,7 @@ const PostCard = ({ post }: PostCardProps) => {
           </ul>
         </div>
 
+{/* image link here */}
         <img
           src={post.imageUrl || "/assets/icons/profile-placeholder.svg"}
           alt="post image"
@@ -76,7 +79,7 @@ const PostCard = ({ post }: PostCardProps) => {
         />
       </Link>
 
-      <PostStats post={post} userId={user.id} />
+       {/* <PostStats post={post} userId={user.id} /> */}
     </div>
   );
 };

@@ -18,7 +18,7 @@ const App = () => {
         </Route>
         {/* private routes */}
         <Route element={<RootLayout />}>
-          <Route index element={<Home />} />
+          <Route path='/home' element={<Home />} /> 
           <Route path="/explore" element={<Explore />}/>
           <Route path="/saved" element={<Saved />}/>
           <Route path="/all-users" element={<AllUsers />}/>
@@ -43,3 +43,4 @@ export default App;
 
 // export default App; // ✅ Ensure 'export default' exists
 
+// index in Home
