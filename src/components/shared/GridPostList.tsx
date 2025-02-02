@@ -1,54 +1,153 @@
-import { Models } from "appwrite";
-import { Link } from "react-router-dom";
+// import { useCallback, useState } from "react";
+// import { FileWithPath, useDropzone } from "react-dropzone";
 
-import { PostStats } from "@/components/shared";
-import { useUserContext } from "@/context/AuthContext";
+// import { Button } from "@/components/ui";
+// import { convertFileToUrl } from "@/lib/utils";
 
-type GridPostListProps = {
-  posts: Models.Document[];
-  showUser?: boolean;
-  showStats?: boolean;
+// type FileUploaderProps = {
+//   fieldChange: (files: File[]) => void;
+//   mediaUrl: string;
+// };
+
+// const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
+//   const [file, setFile] = useState<File[]>([]);
+//   const [fileUrl, setFileUrl] = useState<string>(mediaUrl);
+
+//   const onDrop = useCallback(
+//     (acceptedFiles: FileWithPath[]) => {
+//       // Update the file state and invoke the fieldChange callback
+//       setFile(acceptedFiles);
+//       fieldChange(acceptedFiles);
+//       // Convert the file to a URL for previewing
+//       setFileUrl(convertFileToUrl(acceptedFiles[0]));
+//     },
+//     [fieldChange]  // No need to include 'file' in dependencies since it's set directly
+//   );
+
+//   const { getRootProps, getInputProps } = useDropzone({
+//     onDrop,
+//     accept: {
+//       "image/*": [".png", ".jpeg", ".jpg"],
+//     },
+//   });
+
+//   return (
+//     <div
+//       {...getRootProps()}
+//       className="flex flex-center flex-col bg-dark-3 rounded-xl cursor-pointer"
+//     >
+//       <input {...getInputProps()} className="cursor-pointer" />
+
+//       {fileUrl ? (
+//         <>
+//           <div className="flex flex-1 justify-center w-full p-5 lg:p-10">
+//             <img src={fileUrl} alt="Uploaded file" className="file_uploader-img" />
+//           </div>
+//           <p className="file_uploader-label">Click or drag photo to replace</p>
+//         </>
+//       ) : (
+//         <div className="file_uploader-box">
+//           <img
+//             src="/assets/icons/file-upload.svg"
+//             width={96}
+//             height={77}
+//             alt="file upload"
+//           />
+
+//           <h3 className="base-medium text-light-2 mb-2 mt-6">
+//             Drag photo here
+//           </h3>
+//           <p className="text-light-4 small-regular mb-6">SVG, PNG, JPG</p>
+
+//           <Button type="button" className="shad-button_dark_4">
+//             Select from computer
+//           </Button>
+//         </div>
+//       )}
+//     </div>
+//   );
+// };
+
+// export default FileUploader;
+
+import { useCallback, useState, useEffect } from "react";
+import { FileWithPath, useDropzone } from "react-dropzone";
+
+import { Button } from "@/components/ui";
+import { convertFileToUrl } from "@/lib/utils";
+
+type FileUploaderProps = {
+  fieldChange: (files: File[]) => void;
+  mediaUrl: string;
 };
 
-const GridPostList = ({
-  posts,
-  showUser = true,
-  showStats = true,
-}: GridPostListProps) => {
-  const { user } = useUserContext();
+const FileUploader = ({ fieldChange, mediaUrl }: FileUploaderProps) => {
+  const [file, setFile] = useState<File[]>([]);
+  const [fileUrl, setFileUrl] = useState<string>(mediaUrl);
+
+  // Clear state when component unmounts or file is replaced
+  useEffect(() => {
+    return () => {
+      setFile([]);
+      setFileUrl("");
+    };
+  }, []);
+
+  const onDrop = useCallback(
+    (acceptedFiles: FileWithPath[]) => {
+      // Update file state and invoke fieldChange callback
+      setFile(acceptedFiles);
+      fieldChange(acceptedFiles);
+
+      // Convert the file to a URL for previewing
+      const previewUrl = convertFileToUrl(acceptedFiles[0]);
+      setFileUrl(previewUrl);
+    },
+    [fieldChange]
+  );
+
+  const { getRootProps, getInputProps } = useDropzone({
+    onDrop,
+    accept: {
+      "image/*": [".png", ".jpeg", ".jpg"],
+    },
+  });
 
   return (
-    <ul className="grid-container">
-      {posts.map((post) => (
-        <li key={post.$id} className="relative min-w-80 h-80">
-          <Link to={`/posts/${post.$id}`} className="grid-post_link">
-            <img
-              src={post.imageUrl}
-              alt="post"
-              className="h-full w-full object-cover"
-            />
-          </Link>
+    <div
+      {...getRootProps()}
+      className="flex flex-center flex-col bg-dark-3 rounded-xl cursor-pointer"
+    >
+      <input {...getInputProps()} className="cursor-pointer" />
 
-          <div className="grid-post_user">
-            {showUser && (
-              <div className="flex items-center justify-start gap-2 flex-1">
-                <img
-                  src={
-                    post.creator.imageUrl ||
-                    "/assets/icons/profile-placeholder.svg"
-                  }
-                  alt="creator"
-                  className="w-8 h-8 rounded-full"
-                />
-                <p className="line-clamp-1">{post.creator.name}</p>
-              </div>
-            )}
-            {showStats && <PostStats post={post} userId={user.id} />}
+      {fileUrl ? (
+        <>
+          <div className="flex flex-1 justify-center w-full p-5 lg:p-10">
+            <img src={fileUrl} alt="Uploaded file" className="file_uploader-img" />
           </div>
-        </li>
-      ))}
-    </ul>
+          <p className="file_uploader-label">Click or drag photo to replace</p>
+        </>
+      ) : (
+        <div className="file_uploader-box">
+          <img
+            src="/assets/icons/file-upload.svg"
+            width={96}
+            height={77}
+            alt="file upload"
+          />
+
+          <h3 className="base-medium text-light-2 mb-2 mt-6">
+            Drag photo here
+          </h3>
+          <p className="text-light-4 small-regular mb-6">SVG, PNG, JPG</p>
+
+          <Button type="button" className="shad-button_dark_4">
+            Select from computer
+          </Button>
+        </div>
+      )}
+    </div>
   );
 };
 
-export default GridPostList;
+export default FileUploader;

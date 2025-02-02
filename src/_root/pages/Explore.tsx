@@ -114,14 +114,22 @@
 
 // export default Explore;
 
+// import { useEffect, useState } from "react";
+// import { useInView } from "react-intersection-observer";
+// import { Input } from "@/components/ui";
+// import useDebounce from "@/hooks/useDebounce";
+// import { GridPostList, Loader } from "@/components/shared";
+// import { useGetPosts, useSearchPosts } from "@/lib/react-query/queriesAndMutations";
 import { useEffect, useState } from "react";
 import { useInView } from "react-intersection-observer";
+// import {SearchResults} from '@/components/shared/SearchResults';
 import { Input } from "@/components/ui";
 import useDebounce from "@/hooks/useDebounce";
 import { GridPostList, Loader } from "@/components/shared";
 import { useGetPosts, useSearchPosts } from "@/lib/react-query/queriesAndMutations";
+import SearchResults from "@/components/shared/SearchResults";
 
-export type SearchResultProps = {
+type SearchResultProps = {
   isSearchFetching: boolean;
   searchedPosts: any;
 };
